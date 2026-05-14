@@ -33,6 +33,12 @@ ENV/
 *.swp
 *.swo
 
+# Pytest
+.pytest_cache/
+
+# Ruff
+.ruff_cache/
+
 # Secrets and API keys
 .env
 .env.local

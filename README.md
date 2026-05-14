@@ -2,7 +2,28 @@
 
 An independent, in-progress effort to reproduce [Appen's published benchmark](https://www.appen.com/whitepapers/benchmarking-subquadratics-latest-model-ssa-kernel) of Subquadratic's Sparse Self-Attention (SSA) model from the API side, with full methodology, code, and per-model results.
 
-> **Status:** Phase 1 in progress. Baseline runs on Claude Opus 4.6, Gemini 2M, and GPT-5 (or equivalent SOTA models) are being set up. SubQ access is on the public beta waitlist; Phase 2 (adding SubQ as a backend) starts when access lands.
+> **Status:** Phase 1a harness for RULER NIAH-single is built and smoke-tested; first baseline run (Claude Opus 4.6 at 128K, n=50) is queued. SubQ access is on the public beta waitlist; Phase 2 (adding SubQ as a backend) starts when access lands.
+
+## Quick start
+
+```bash
+git clone https://github.com/tinarezvanian/ssa-benchmark-replication
+cd ssa-benchmark-replication
+python3.13 -m venv .venv && . .venv/bin/activate
+pip install -e ".[dev]"
+pytest                                          # 8 unit tests; no API needed
+cp .env.example .env && $EDITOR .env            # add ANTHROPIC_API_KEY
+
+# Smoke test (~$0.50, returns immediately)
+ssa-bench niah-single --mode single --n 5 --context-tokens 32000
+
+# First publishable result (~$16 on batch API, returns in 1–2 hours)
+ssa-bench niah-single --mode batch --n 50 --context-tokens 128000
+```
+
+Every run drops a self-contained directory under `runs/` with:
+`config.json`, `samples.jsonl`, `responses.jsonl`, `verdicts.jsonl`,
+`summary.json`, and `results.md`.
 
 ## Why this exists
 
@@ -19,9 +40,10 @@ The retrieval and code-quality benchmarks are the ones developers care about mos
 
 | Benchmark | Public dataset? | Tier | Status |
 |---|---|---|---|
-| **RULER** | Yes ([NVIDIA/RULER](https://github.com/NVIDIA/RULER)) | 128K tokens, all 13 task types, 100 samples each | Harness scaffold |
-| **MRCR** | Yes | 8-needle, 1,048,576 tokens, 100 samples | Harness scaffold |
-| **SWE-Bench Verified** | Yes ([princeton-nlp/SWE-bench](https://github.com/princeton-nlp/SWE-bench)) | Full Verified split, Dockerized patch eval | Harness scaffold |
+| **RULER NIAH-single** | Yes ([NVIDIA/RULER](https://github.com/NVIDIA/RULER) spec) | 128K tokens, 50–100 samples | **Harness built, smoke-tested, first run queued** |
+| RULER (full suite) | Yes | 128K, 13 task types | After NIAH-single |
+| **MRCR** | Yes | 8-needle, 1,048,576 tokens, 100 samples | Spec only |
+| **SWE-Bench Verified** | Yes ([princeton-nlp/SWE-bench](https://github.com/princeton-nlp/SWE-bench)) | Full Verified split, Dockerized patch eval | Spec only |
 
 ## Models under evaluation
 
